@@ -1,5 +1,10 @@
 # Working with Multiple Files - Build Systems
 
+<!-- TODO: create autotests for the non CLI code (use amalgamated catch) -->
+<!-- g++ -c catch_amalgamated.cpp  // ... -->
+<!-- TODO: add autotests to classroom definition -->
+
+Note that this task does not have any automated tests (yet).
 
 ## Calculate Total Resistance
 
@@ -7,7 +12,8 @@ Implement a `struct Circuit` that stores the resistances of three different
 resistors and a `bool` indicating whether the three resistors are in series or
 parallel. Declare `struct Circuit` in `circuit.h`. Store the resistances using
 double precision floating point numbers.
-Create the following files: `circuit.c`, `circuit.h`, `main.c`, `ui.c`, `ui.h`
+Create the following files: `circuit.c`, `circuit.h`, `circuit_cli.c`,
+`ui.c`, `ui.h`
 and implement the functions below.
 
 
@@ -34,17 +40,18 @@ void draw_circuit(const Circuit& c);
 void print_circuit(const Circuit& c);
 
 
-/* main.c */
+/* circuit_cli.c */
 // create at least two different circuits (one parallel and one serial)
 // and use both draw_circuit(.) and print_circuit(.) on each of them
 int main();
 ```
 
 Declare all functions in the corresponding header files and include the header
-files wherever needed.
+files exactly where they are needed.
 Make sure to use `#include` guards in each of the header files.
 
 For now, compile and test this task manually from the commandline.
+Name the binary `calculate_resistance`.
 
 
 ## Inventory Management System
@@ -52,15 +59,15 @@ For now, compile and test this task manually from the commandline.
 Your employer stores many different electric components (resistors, capacitors,
 ...). It is your duty to create an in-memory database to keep track of these
 components. Create the following files to contain your program:
-`inventory.{c,h}`, `interface.{c,h}`. Use the existing `main.c` and extend
+`interface.{c,h}, inventory.{c,h}`, and `inventory_cli.c`. Use the existing `main.c` and extend
 `main(.)` to use your new code.
 
-In `inventory.h` define a `struct Item`. Each `Item` stores
+In `inventory.h` define `struct Item`. Each `Item` stores
 
-* 80 characters for the component type (resistor, capacitor, ...)
-* unsigned holding the quantity of devices available
-* double holding the value (resistance, capacity, ...)
-* 20 characters for the unit (Ω, MΩ, µF, ...)
+* a `std::string` for the component type (resistor, capacitor, ...)
+* a `uint32_t` holding the quantity of devices available
+* a `double` holding the value (resistance, capacity, ...)
+* a `std::string` for the unit (Ω, MΩ, µF, ...)
 
 Create the following functions: 
 
@@ -97,10 +104,15 @@ void print_items(const std::vector<Item>& items);
 // `l` -> show the list of items
 // `r` -> show the number of resistors
 void cli();
+
+
+/* inventory_cli.c */
+// start the command-line interface
+int main();
 ```
 
-In your existing `main(.)` add a call to `cli()`.
 For now, compile and test this task manually from the commandline.
+Name the binary `ims`.
 
 
 ## Build Systems
@@ -112,17 +124,24 @@ GNU `Makefile` with the following high level targets:
 * all - compile everything
 * clean - clean up everything
 
-Make sure to only (re-)compile what really needs to be compiled when `make`
-is called. To do so, you will need to create additional targets for the
-object files.
+Make sure that your Makefile is written so that source files are only
+compiled when this is really needed. To do so, you will need to create
+additional targets for the object files.
+
+The build should be done in-source, ie. all object files and the final
+binary should be created along the source files.
+When doing a clean be careful not to delete any of the source files.
+
 
 ### CMake
 Once the GNU `Makefile` works properly, create a `CMakeLists.txt` that
 generates a `Makefile` for your platform. Test building your project out of
-source with `cmake` (by convention, create the build in the `build`
+source (by convention, create the build in the `build`
 subdirectory).
 
+
+### README.md
 Finally, edit this `README.md` file and briefly explain at the beginning how
-the project can be compiled. The
-[markdown cheatsheet](https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet)
-has all the information you need on the syntax to get started.
+the project can be compiled using both alternatives above. The markdown
+[cheatsheet](https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet)
+has all the information you need to get started.
