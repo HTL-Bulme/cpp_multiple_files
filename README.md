@@ -1,147 +1,128 @@
-# Dynamic Memory Management (Free Store)
-
-Exercise material for using the free store in the C++ programming language.
-In this homework you are asked to restrict yourself to not using any
-`include` except `<cstddef>` and `<iostream>`.
-
-Before creating a build to run the tests, it is important that all of the
-required files (`create_arrays.{cpp,hpp}`, `int_array.{cpp,hpp}`, `main.cpp`)
-are created alongside the `*_test.cpp` files. Until all required functions are
-declared in the header files, compilation will fail. Until all required
-functions are defined (an empty function body or returning a dummy value is
-sufficient), the linking won't succeed. In `main.cpp`, at least
-a dummy `main(.)` function is required for compilation. Do not add a `main(.)`
-function to your `create_arrays.cpp` or `int_array.cpp` files.
-With all this in place, compile and run the tests as described below.
-Implement `main(.)` in a separate module called `main.cpp`. Include all header
-files of this exercise and use all of the implemented functions.
-Have `main(.)` print the data and never forget to use `delete` / `delete[]`.
-Explain in a comment, why `delete` and `delete[]` has to be used.
-
-Create the source and header files as required by the description of the
-exercise below. Then compile your solution:
-
-```
-mkdir -p build && cd build
-cmake ..
-make -j8
-```
+# Working with Multiple Files - Build Systems
 
 
-## Create Arrays on the Free Store
+## Calculate Total Resistance
 
-Implement the following functions:
+Implement a `struct Circuit` that stores the resistances of three different
+resistors and a `bool` indicating whether the three resistors are in series or
+parallel. Declare `struct Circuit` in `circuit.h`. Store the resistances using
+double precision floating point numbers.
+Create the following files: `circuit.c`, `circuit.h`, `main.c`, `ui.c`, `ui.h`
+and implement the functions below.
+
 
 ```cpp
-/*! Return array on the free store containing `dimension` zeros.
- *
- * The memory for the array is allocated on the heap and all values are
- * initialized to zero.
- *
- * eg. zeros(3) -> {0, 0, 0}
-*/
-int* zeros(std::size_t dimension);
+/* circuit.h, circuit.c */
+// return the total resistance of the circuit
+double calc_circuit_resistance(const Circuit& c);
 
-//! Return array on the free store containing `dimension` ones.
-int* ones(std::size_t dimension);
 
-//! Return array on the free store containing `0, 1, 2, 3, ..., dimension-1`.
-int* range(std::size_t dimension);
+/* ui.h, ui.c */
+// read the resistances from stdin
+// also ask the user whether a parallel or series connection is used
+// return a new circuit struct containing the above data
+Circuit read_circuit();
+// print a visual representation of the struct; this can be something like
+// -[220Ω]-[330Ω]-[220Ω]- and
+//
+//  ┌[220Ω]┐
+// ─┼[330Ω]┼─
+//  └[220Ω]┘
+void draw_circuit(const Circuit& c);
+// print the values of the resistors, whether a parallel or series connection
+// is used and the total resistance
+void print_circuit(const Circuit& c);
+
+
+/* main.c */
+// create at least two different circuits (one parallel and one serial)
+// and use both draw_circuit(.) and print_circuit(.) on each of them
+int main();
 ```
 
-Name the source file: `create_arrays.cpp` and the corresponding header file
-`create_arrays.hpp`.
+Declare all functions in the corresponding header files and include the header
+files wherever needed.
+Make sure to use `#include` guards in each of the header files.
+
+For now, compile and test this task manually from the commandline.
 
 
-## Create Your Own int Array Data Type
+## Inventory Management System
 
-Implement a data structure IntArray that helps you to work with arrays of
-dynamic size. The core of the data type should be a struct storing a pointer
-to an array on the free store and the required metadata. All of your functions
-as well as `IntArray` itself must be placed inside of a namespace called `ia`.
+Your employer stores many different electric components (resistors, capacitors,
+...). It is your duty to create an in-memory database to keep track of these
+components. Create the following files to contain your program:
+`inventory.{c,h}`, `interface.{c,h}`. Use the existing `main.c` and extend
+`main(.)` to use your new code.
+
+In `inventory.h` define a `struct Item`. Each `Item` stores
+
+* 80 characters for the component type (resistor, capacitor, ...)
+* unsigned holding the quantity of devices available
+* double holding the value (resistance, capacity, ...)
+* 20 characters for the unit (Ω, MΩ, µF, ...)
+
+Create the following functions: 
 
 ```cpp
-struct IntArray {
-  std::size_t reserved;  ///< available storage
-  std::size_t elements;  ///< current number of elements
-  int* array;
-};
+/* inventory.h, inventory.c */
+// Return the total number of resistors in the inventory.
+// Eg. there are 100 resistors with 330 ohm, 50 with 5600 ohm and 10 with
+// 2 megaohm, the total number is 160.
+std::size_t count_resistors(const std::vector<Item>& items);
+
+// Return the total number of capacitors in the inventory.
+std::size_t count_capacitors(const std::vector<Item>& items);
+
+
+/* interface.h, interface.c */
+// ask the user to enter a new item on the command-line;
+// add the new item to the given list and return the count increased by one
+// (since there is one more element in the inventory array)
+void add_item(std::vector<Item>& items);
+
+// print given item to stdout
+void print_item(Item i);
+
+// print all items, one per line
+void print_items(const std::vector<Item>& items);
+
+// command-line interface to create and manage an inventory
+// start a loop that asks the user which action they want to perform
+// `a` -> create a new item and add it to the inventory array
+// `c` -> show the number of capacitors
+// `e` -> exit the program
+// `i n` -> show the n-th item (0-indexed) of the inventory array
+// `h` -> show this help text
+// `l` -> show the list of items
+// `r` -> show the number of resistors
+void cli();
 ```
 
-Implement the following API to create and work with `IntArray`:
+In your existing `main(.)` add a call to `cli()`.
+For now, compile and test this task manually from the commandline.
 
-```cpp
-//! Create new empty IntArray for 100 elements.
-IntArray* create();
 
-//! Create new array with `dimension` zeros.
-IntArray* zeros(std::size_t dimension);
+## Build Systems
 
-//! Create new array with `dimension` ones.
-IntArray* ones(std::size_t dimension);
+### GNU Make
+In order to be able to compile the above tasks conveniently, write a
+GNU `Makefile` with the following high level targets:
 
-//! Create new array with stop-start elements: start ... stop-1.
-IntArray* range(int start, int stop);
+* all - compile everything
+* clean - clean up everything
 
-//! Free the array and the IntArray struct; return `nullptr`.
-IntArray* destroy(IntArray* ia);
+Make sure to only (re-)compile what really needs to be compiled when `make`
+is called. To do so, you will need to create additional targets for the
+object files.
 
-//! Remove and return last element of `ia`
-int pop_back(IntArray* ia);
+### CMake
+Once the GNU `Makefile` works properly, create a `CMakeLists.txt` that
+generates a `Makefile` for your platform. Test building your project out of
+source with `cmake` (by convention, create the build in the `build`
+subdirectory).
 
-/*! Add `elem` to `ia`.
- *
- * If that would exceed the available reserved memory, double the size of
- * the array.
- */
-void push_back(IntArray* ia, int elem);
-
-/*! Insert `elem` before element at index.
- *
- * If that would exceed the available reserved memory, double the size of
- * the array.
- */
-void insert(IntArray* ia, std::size_t index, int elem);
-
-//! Return the number of occurrences of `elem` in `ia`.
-std::size_t count(IntArray* ia, int elem);
-
-/*!
- * Return element at index.
- * If the index is out of bounds, write "IndexError" and some useful context
- * to stderr and terminate the execution of the program.
- */
-int index(IntArray* ia, std::size_t index);
-
-//! Print a representation of the array to stdout.
-void print(IntArray* ia);
-
-//! Return the current number of elements.
-std::size_t size(IntArray* ia);
-
-//! Return the sum of all elements.
-long int sum(IntArray* ia);
-
-/*
- * Return new `IntArray*` where all elements are the pairwise sum of the
- * elements of the given two arrays. If one array is shorter,
- * solely use the elements of the longer array for the higher indices.
- */
-IntArray* add(IntArray* first, IntArray* second);
-
-/*
- * Return new `IntArray*` where all elements are the pairwise product of the
- * elements of the given two arrays. If one array is shorter,
- * solely use the elements of the longer array for the higher indices.
- */
-IntArray* mul(IntArray* first, IntArray* second);
-```
-
-All of the above functions must ensure that the data stored in the struct is
-consistent at all times. For example, adding an element must also increase the
-value of `elements` and, if needed, the value of `reserved`. Use and
-thoroughly test your implementation in a designated `main(.)` function
-in `main.cpp`.
-
-Name the source file: `int_array.cpp` and the corresponding header
-file `int_array.hpp`.
+Finally, edit this `README.md` file and briefly explain at the beginning how
+the project can be compiled. The
+[markdown cheatsheet](https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet)
+has all the information you need on the syntax to get started.
