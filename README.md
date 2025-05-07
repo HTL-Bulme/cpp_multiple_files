@@ -8,33 +8,35 @@ Note that this task does not have any automated tests (yet).
 
 ## Calculate Total Resistance
 
-Implement a `struct Circuit` that stores the resistances of three different
-resistors and a `bool` indicating whether the three resistors are in series or
-parallel. Declare `struct Circuit` in `circuit.h`. Store the resistances using
-double precision floating point numbers.
-Create the following files: `circuit.c`, `circuit.h`, `circuit_cli.c`,
-`ui.c`, `ui.h`
-and implement the functions below.
+Implement a `struct Circuit` that stores the resistances of $n$ different
+resistors and a `bool` indicating whether the resistors are in series or
+parallel. Declare `struct Circuit` in `circuit.hpp`. Store the resistances
+using a `std::vector` of double precision floating point numbers.
+
+Create the following files: `circuit.cpp`, `circuit.hpp`, `circuit_cli.cpp`,
+`ui.cpp`, `ui.hpp`  and implement the functions below.
 
 
 ```cpp
-/* circuit.h, circuit.c */
+/* circuit.hpp, circuit.cpp */
 // return the total resistance of the circuit
 double calc_circuit_resistance(const Circuit& c);
 
 
-/* ui.h, ui.c */
+/* ui.hpp, ui.cpp */
 // read the resistances from stdin
 // also ask the user whether a parallel or series connection is used
-// return a new circuit struct containing the above data
+// return a new `Circuit` containing the above data
 Circuit read_circuit();
+
 // print a visual representation of the struct; this can be something like
-// -[220Ω]-[330Ω]-[220Ω]- and
+// -[220Ω]-[330Ω]-[220Ω]- or
 //
 //  ┌[220Ω]┐
 // ─┼[330Ω]┼─
 //  └[220Ω]┘
 void draw_circuit(const Circuit& c);
+
 // print the values of the resistors, whether a parallel or series connection
 // is used and the total resistance
 void print_circuit(const Circuit& c);
@@ -50,6 +52,20 @@ Declare all functions in the corresponding header files and include the header
 files exactly where they are needed.
 Make sure to use `#include` guards in each of the header files.
 
+The total resistance $R_t$ is calculated using the following formula for
+parallel resistors
+
+$$
+R_t = \frac{1}{\sum_{i=1}^n \frac{1}{R_i}}
+$$
+
+In case of serial resistors, $R_t$ is calculated as the sum of each
+resistance.
+
+$$
+R_t = \sum_{i=1}^n R_i
+$$
+
 For now, compile and test this task manually from the commandline.
 Name the binary `calculate_resistance`.
 
@@ -57,12 +73,11 @@ Name the binary `calculate_resistance`.
 ## Inventory Management System
 
 Your employer stores many different electric components (resistors, capacitors,
-...). It is your duty to create an in-memory database to keep track of these
-components. Create the following files to contain your program:
-`interface.{c,h}, inventory.{c,h}`, and `inventory_cli.c`. Use the existing `main.c` and extend
-`main(.)` to use your new code.
+diodes, ...). It is your duty to create an in-memory database to keep track of
+these components. Create the following files to contain your program:
+`interface.{cpp,hpp}, inventory.{cpp,hpp}`, and `inventory_cli.cpp`.
 
-In `inventory.h` define `struct Item`. Each `Item` stores
+In `inventory.hpp` define `struct Item`. Each `Item` stores
 
 * a `std::string` for the component type (resistor, capacitor, ...)
 * a `uint32_t` holding the quantity of devices available
@@ -72,7 +87,7 @@ In `inventory.h` define `struct Item`. Each `Item` stores
 Create the following functions: 
 
 ```cpp
-/* inventory.h, inventory.c */
+/* inventory.hpp, inventory.cpp */
 // Return the total number of resistors in the inventory.
 // Eg. there are 100 resistors with 330 ohm, 50 with 5600 ohm and 10 with
 // 2 megaohm, the total number is 160.
@@ -82,7 +97,7 @@ std::size_t count_resistors(const std::vector<Item>& items);
 std::size_t count_capacitors(const std::vector<Item>& items);
 
 
-/* interface.h, interface.c */
+/* interface.hpp, interface.cpp */
 // ask the user to enter a new item on the command-line;
 // add the new item to the given list and return the count increased by one
 // (since there is one more element in the inventory array)
@@ -106,7 +121,7 @@ void print_items(const std::vector<Item>& items);
 void cli();
 
 
-/* inventory_cli.c */
+/* inventory_cli.cpp */
 // start the command-line interface
 int main();
 ```
