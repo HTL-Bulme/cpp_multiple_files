@@ -42,7 +42,7 @@ void draw_circuit(const Circuit& c);
 void print_circuit(const Circuit& c);
 
 
-/* circuit_cli.c */
+/* circuit_cli.cpp */
 // create at least two different circuits (one parallel and one serial)
 // and use both draw_circuit(.) and print_circuit(.) on each of them
 int main();
