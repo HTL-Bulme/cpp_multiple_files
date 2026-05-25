@@ -99,8 +99,7 @@ std::size_t count_capacitors(const std::vector<Item>& items);
 
 /* interface.hpp, interface.cpp */
 // ask the user to enter a new item on the command-line;
-// add the new item to the given list and return the count increased by one
-// (since there is one more element in the inventory array)
+// add the new item to the given vector
 void add_item(std::vector<Item>& items);
 
 // print given item to stdout
