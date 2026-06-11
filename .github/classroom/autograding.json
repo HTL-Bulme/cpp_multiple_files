@@ -3,28 +3,26 @@
     {
       "name": "Test if `calculate_resistance` is built via make",
       "setup": "make -j4",
-      "run": "./calculate_resistance",
+      "run": "ls calculate_resistance",
       "timeout": 2.5,
       "points": 1
     },
     {
       "name": "Test if `ims` is built via make",
-      "setup": "make -j4",
       "run": "ls ims",
       "timeout": 2.5,
       "points": 1
     },
     {
       "name": "Test if `calculate_resistance` is built via cmake",
-      "setup": "mkdir -p build && cd build; cmake ..; make -j4",
-      "run": "build/calculate_resistance",
+      "setup": "mkdir -p build && cd build; cmake ..; make -j4; cd ..",
+      "run": "ls build/calculate_resistance",
       "timeout": 2.5,
       "points": 1
     },
     {
       "name": "Test if `ims` is built via cmake",
-      "setup": "mkdir -p build && cd build; cmake ..; make -j4",
-      "run": "ls ims",
+      "run": "ls build/ims",
       "timeout": 2.5,
       "points": 1
     },
